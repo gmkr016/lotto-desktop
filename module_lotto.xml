@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_lotto" default="compile.module.lotto">
+  <dirname property="module.lotto.basedir" file="${ant.file.module_lotto}"/>
+  
+  <property name="module.jdk.home.lotto" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.lotto" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.lotto" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.lotto" value="-encoding UTF-8 -source 12 -target 12 ${compiler.args}"/>
+  
+  <property name="lotto.output.dir" value="${module.lotto.basedir}/out/production/lotto"/>
+  <property name="lotto.testoutput.dir" value="${module.lotto.basedir}/out/test/lotto"/>
+  
+  <path id="lotto.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="lotto.module.production.classpath">
+    <path refid="${module.jdk.classpath.lotto}"/>
+  </path>
+  
+  <path id="lotto.runtime.production.module.classpath">
+    <pathelement location="${lotto.output.dir}"/>
+  </path>
+  
+  <path id="lotto.module.classpath">
+    <path refid="${module.jdk.classpath.lotto}"/>
+    <pathelement location="${lotto.output.dir}"/>
+  </path>
+  
+  <path id="lotto.runtime.module.classpath">
+    <pathelement location="${lotto.testoutput.dir}"/>
+    <pathelement location="${lotto.output.dir}"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.lotto">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.lotto">
+    <patternset refid="excluded.from.module.lotto"/>
+  </patternset>
+  
+  <path id="lotto.module.sourcepath">
+    <dirset dir="${module.lotto.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.lotto" depends="compile.module.lotto.production,compile.module.lotto.tests" description="Compile module lotto"/>
+  
+  <target name="compile.module.lotto.production" depends="register.custom.compilers" description="Compile module lotto; production classes">
+    <mkdir dir="${lotto.output.dir}"/>
+    <javac2 destdir="${lotto.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.lotto}/javac">
+      <compilerarg line="${compiler.args.lotto}"/>
+      <bootclasspath refid="lotto.module.bootclasspath"/>
+      <classpath refid="lotto.module.production.classpath"/>
+      <src refid="lotto.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.lotto"/>
+    </javac2>
+    
+    <copy todir="${lotto.output.dir}">
+      <fileset dir="${module.lotto.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.lotto.tests" depends="register.custom.compilers,compile.module.lotto.production" description="compile module lotto; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.lotto" description="cleanup module">
+    <delete dir="${lotto.output.dir}"/>
+    <delete dir="${lotto.testoutput.dir}"/>
+  </target>
+</project>
